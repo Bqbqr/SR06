@@ -1,0 +1,67 @@
+version 12.3
+no service pad
+service timestamps debug datetime msec
+service timestamps log datetime msec
+service password-encryption
+!
+hostname ap
+!
+!
+ip subnet-zero
+!
+username Cisco password Cisco
+username Cisco password 7 14341B180F0B
+!
+enable secret Cisco
+!
+no aaa new-model
+!
+!
+!
+bridge irb
+!
+!
+interface Dot11Radio0
+ no ip address
+ no ip route-cache
+ shutdown
+ speed basic-1.0 basic-2.0 basic-5.5 6.0 9.0 basic-11.0 12.0 18.0 24.0 36.0 48.0 54.0
+ station-role root
+ bridge-group 1
+ bridge-group 1 subscriber-loop-control
+ bridge-group 1 block-unknown-source
+ no bridge-group 1 source-learning
+ no bridge-group 1 unicast-flooding
+ bridge-group 1 spanning-disabled
+!
+interface FastEthernet0
+ no ip address
+ no ip route-cache
+ duplex auto
+ speed auto
+ bridge-group 1
+ no bridge-group 1 source-learning
+ bridge-group 1 spanning-disabled
+ hold-queue 160 in
+!
+interface BVI1
+ ip address dhcp client-id FastEthernet0
+ no ip route-cache
+!
+ip http server
+no ip http secure-server
+ip http help-path http://www.cisco.com/warp/public/779/smbiz/prodconfig/help/eag
+!
+!
+control-plane
+!
+bridge 1 route ip
+!
+!
+!
+line con 0
+line vty 0 4
+ login local
+ password Cisco
+!
+end

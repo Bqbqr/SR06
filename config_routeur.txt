@@ -1,0 +1,177 @@
+
+!
+version 12.3
+no service pad
+service timestamps debug datetime msec
+service timestamps log datetime msec
+service password-encryption
+!
+hostname ap
+!
+enable secret 5 $1$37er$8.TbJwxGF1upoMVl6jQkW/
+!
+clock timezone cet 1
+ip subnet-zero
+!
+!
+aaa new-model
+!
+!
+aaa group server radius rad_eap
+ server 100.51.0.2 auth-port 1812 acct-port 1646
+!
+aaa group server radius rad_mac
+!
+aaa group server radius rad_acct
+!
+aaa group server radius rad_admin
+!
+aaa group server tacacs+ tac_admin
+!
+aaa group server radius rad_pmip
+!
+aaa group server radius dummy
+!
+aaa authentication login eap_methods group rad_eap
+aaa authentication login mac_methods local
+aaa authentication dot1x default group radius
+aaa authentication dot1x group group radius
+aaa authorization exec default local 
+aaa accounting network acct_methods start-stop group rad_acct
+aaa session-id common
+dot11 vlan-name ADMIN vlan 51
+dot11 vlan-name INVITE vlan 52
+dot11 vlan-name PERSONNEL vlan 53
+!
+dot11 ssid INVITE5
+   vlan 52
+   authentication open 
+!
+dot11 ssid PERSONNEL5
+   vlan 53
+   authentication open eap eap_methods 
+   authentication network-eap eap_methods 
+   guest-mode
+!
+!
+!
+username Cisco password 7 14341B180F0B
+username 10683ffa5edd password 7 005543505C080D000E74494A0D
+username 10683ffa5edd autocommand exit
+!
+bridge irb
+!
+!
+interface Dot11Radio0
+ no ip address
+ no ip route-cache
+ !
+ encryption vlan 52 key 1 size 40bit 7 C1F54D861DC7 transmit-key
+ encryption vlan 52 mode wep mandatory 
+ !
+ encryption vlan 53 key 1 size 128bit 7 43C37A4E14293EF3175A6D266A07 transmit-key
+ encryption vlan 53 mode wep mandatory 
+ !
+ ssid INVITE5
+ !
+ ssid PERSONNEL5
+ !
+ speed basic-1.0 basic-2.0 basic-5.5 basic-11.0
+ channel 2447
+ station-role root
+!
+interface Dot11Radio0.51
+ encapsulation dot1Q 51 native
+ no ip route-cache
+ bridge-group 1
+ bridge-group 1 subscriber-loop-control
+ bridge-group 1 block-unknown-source
+ no bridge-group 1 source-learning
+ no bridge-group 1 unicast-flooding
+ bridge-group 1 spanning-disabled
+!
+interface Dot11Radio0.52
+ encapsulation dot1Q 52
+ no ip route-cache
+ bridge-group 52
+ bridge-group 52 subscriber-loop-control
+ bridge-group 52 block-unknown-source
+ no bridge-group 52 source-learning
+ no bridge-group 52 unicast-flooding
+ bridge-group 52 spanning-disabled
+!
+interface Dot11Radio0.53
+ encapsulation dot1Q 53
+ no ip route-cache
+ bridge-group 53
+ bridge-group 53 subscriber-loop-control
+ bridge-group 53 block-unknown-source
+ no bridge-group 53 source-learning
+ no bridge-group 53 unicast-flooding
+ bridge-group 53 spanning-disabled
+!
+interface FastEthernet0
+ no ip address
+ no ip route-cache
+ duplex auto
+ speed auto
+ hold-queue 160 in
+!
+interface FastEthernet0.51
+ encapsulation dot1Q 51 native
+ no ip route-cache
+ bridge-group 1
+ no bridge-group 1 source-learning
+ bridge-group 1 spanning-disabled
+!
+interface FastEthernet0.52
+ encapsulation dot1Q 52
+ no ip route-cache
+ bridge-group 52
+ no bridge-group 52 source-learning
+ bridge-group 52 spanning-disabled
+!
+interface FastEthernet0.53
+ encapsulation dot1Q 53
+ no ip route-cache
+ bridge-group 53
+ no bridge-group 53 source-learning
+ bridge-group 53 spanning-disabled
+!
+interface BVI1
+ ip address dhcp client-id FastEthernet0
+ no ip route-cache
+!
+ip http server
+no ip http secure-server
+ip http help-path http://www.cisco.com/warp/public/779/smbiz/prodconfig/help/eag
+ip radius source-interface BVI1 
+!
+logging trap debugging
+logging facility local4
+logging 100.51.0.2
+snmp-server view dot11view ieee802dot11 included
+snmp-server community macomm RO
+snmp-server community public view dot11view RO
+snmp-server community private RO
+snmp-server chassis-id SNMPAP
+snmp-server enable traps disassociate
+snmp-server enable traps deauthenticate
+snmp-server enable traps authenticate-fail
+snmp-server host 100.51.0.2 private  disassociate deauthenticate authenticate-fail
+radius-server attribute 32 include-in-access-req format %h
+radius-server host 100.51.0.2 auth-port 1812 acct-port 1646 key 7 044F0E151B284249584B56
+radius-server vsa send accounting
+!
+control-plane
+!
+bridge 1 route ip
+!
+!
+!
+line con 0
+line vty 0 4
+ password 7 13261E010803
+!
+sntp server 100.51.0.2
+end

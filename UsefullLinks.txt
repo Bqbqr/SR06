@@ -1,0 +1,4 @@
+http://www.gentoo-wiki.info/HOWTO_Cisco_device_logging#Configure_Syslog-ng
+http://www.ciscopress.com/articles/article.asp?p=426638&seqNum=3
+http://www.cisco.com/c/en/us/support/docs/wireless/aironet-1100-series/44844-leapserver.html
+http://wiki.freeradius.org/guide/Basic-configuration-HOWTO
